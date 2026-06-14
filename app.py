@@ -12,7 +12,7 @@ def home():
     return render_template("index.html")
 
 
-# ---------------- REGISTER (REAL DB LOGIN SYSTEM) ----------------
+# ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -39,7 +39,7 @@ def register():
     return render_template("register.html")
 
 
-# ---------------- LOGIN (REAL AUTH USING USER_ACCOUNT) ----------------
+# ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -62,7 +62,6 @@ def login():
             session["username"] = user[1]
             session["role"] = user[2]
 
-            # update last login
             cur.execute("""
                 UPDATE User_Account
                 SET Last_Login=?
@@ -87,7 +86,7 @@ def logout():
     return redirect("/login")
 
 
-# ---------------- DASHBOARD (DYNAMIC REAL DATA) ----------------
+# ---------------- DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session:
@@ -96,7 +95,6 @@ def dashboard():
     conn = sqlite3.connect("hostel.db")
     cur = conn.cursor()
 
-    # real data from your database
     cur.execute("SELECT COUNT(*) FROM Student")
     students = cur.fetchone()[0]
 
@@ -118,6 +116,40 @@ def dashboard():
     )
 
 
+# ----------------  ADMIN PANEL (NEW UPGRADE) ----------------
+@app.route("/admin")
+def admin_panel():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if session.get("role") != "Admin":
+        return "Access Denied"
+
+    conn = sqlite3.connect("hostel.db")
+    cur = conn.cursor()
+
+    # users
+    cur.execute("SELECT User_ID, Username, User_Role FROM User_Account")
+    users = cur.fetchall()
+
+    # complaints
+    cur.execute("SELECT Complaint_ID, Student_ID, Complaint_Type, Status FROM Complaint")
+    complaints = cur.fetchall()
+
+    # rooms
+    cur.execute("SELECT Room_ID, Room_Number, Room_Type, Room_Status FROM Room")
+    rooms = cur.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "admin.html",
+        users=users,
+        complaints=complaints,
+        rooms=rooms
+    )
+
+
 # ---------------- PROFILE ----------------
 @app.route("/profile")
 def profile():
@@ -127,7 +159,7 @@ def profile():
     return render_template("profile.html")
 
 
-# ---------------- OTHER PAGES (UNCHANGED UI PAGES) ----------------
+# ---------------- OTHER PAGES ----------------
 @app.route("/book-hostel")
 def book_hostel():
     return render_template("book_hostel.html")
@@ -163,6 +195,6 @@ def registered_complaint():
     return render_template("registered_complaint.html")
 
 
-# ---------------- RUN APP ----------------
+# ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)
