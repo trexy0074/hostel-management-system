@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Profile</h2>
+
+<h2>User Profile</h2>
 
 <div class="card">
-    <p>User Profile Details</p>
+    <h3>Welcome, {{ session['user'] }}</h3>
+
+    <p><b>Username:</b> {{ session['user'] }}</p>
+
+    <p><b>Status:</b> Active Student</p>
 </div>
+
 {% endblock %}

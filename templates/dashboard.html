@@ -1,9 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Dashboard</h2>
 
-<div class="card">
-    <p>Welcome, user!</p>
+<h2 class="title">Dashboard</h2>
+
+<p class="subtitle">Welcome, {{ session['user'] }}</p>
+
+<div class="grid">
+
+    <div class="card box">
+        <h3>Total Rooms</h3>
+        <p>120</p>
+    </div>
+
+    <div class="card box">
+        <h3>Available Rooms</h3>
+        <p>35</p>
+    </div>
+
+    <div class="card box">
+        <h3>Registered Users</h3>
+        <p>200</p>
+    </div>
+
+    <div class="card box">
+        <h3>Complaints</h3>
+        <p>12 Pending</p>
+    </div>
+
 </div>
+
 {% endblock %}
