@@ -12,7 +12,7 @@ def home():
     return render_template("index.html")
 
 
-# ---------------- AUTH ----------------
+# ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -21,6 +21,12 @@ def register():
 
         conn = sqlite3.connect("hostel.db")
         cur = conn.cursor()
+
+        # FIX: prevent duplicate users
+        cur.execute("SELECT * FROM User_Account WHERE Username=?", (username,))
+        if cur.fetchone():
+            conn.close()
+            return "Username already exists"
 
         cur.execute("""
             INSERT INTO User_Account (Username, Password, User_Role, Last_Login)
@@ -35,6 +41,7 @@ def register():
     return render_template("auth/register.html")
 
 
+# ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -68,8 +75,7 @@ def login():
 
             if user[2] == "Admin":
                 return redirect("/admin")
-            else:
-                return redirect("/dashboard")
+            return redirect("/dashboard")
 
         conn.close()
         return "Invalid username or password"
@@ -77,13 +83,14 @@ def login():
     return render_template("auth/login.html")
 
 
+# ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
 
-# ---------------- STUDENT DASHBOARD ----------------
+# ---------------- DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session:
@@ -113,11 +120,10 @@ def dashboard():
     )
 
 
-# ---------------- STUDENT REGISTRATION ----------------
+# ---------------- STUDENT REGISTER ----------------
 @app.route("/student/register", methods=["GET", "POST"])
 def student_register():
     if request.method == "POST":
-
         conn = sqlite3.connect("hostel.db")
         cur = conn.cursor()
 
@@ -172,7 +178,6 @@ def complaint():
         return redirect("/login")
 
     if request.method == "POST":
-
         conn = sqlite3.connect("hostel.db")
         cur = conn.cursor()
 
@@ -248,12 +253,10 @@ def admin_panel():
 
     conn.close()
 
-    return render_template(
-        "admin/admin.html",
-        users=users,
-        complaints=complaints,
-        rooms=rooms
-    )
+    return render_template("admin/admin.html",
+                           users=users,
+                           complaints=complaints,
+                           rooms=rooms)
 
 
 # ---------------- DELETE USER ----------------
@@ -288,7 +291,7 @@ def delete_complaint(cid):
     return redirect("/admin")
 
 
-# ---------------- RESOLVE COMPLAINT ----------------
+# ---------------- RESOLVE ----------------
 @app.route("/admin/resolve-complaint/<int:cid>")
 def resolve_complaint(cid):
     if session.get("role") != "Admin":

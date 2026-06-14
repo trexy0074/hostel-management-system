@@ -2,13 +2,26 @@
 
 {% block content %}
 
-<h2>Welcome {{ username }}</h2>
-<p>Role: {{ role }}</p>
+<h1>Welcome, {{ username }}</h1>
+<p style="color:#94a3b8">Role: {{ role }}</p>
 
 <div class="grid">
-    <div class="card">Students: {{ students }}</div>
-    <div class="card">Complaints: {{ complaints }}</div>
-    <div class="card">Rooms: {{ rooms }}</div>
+
+    <div class="card">
+        <h2>{{ students }}</h2>
+        <p>Total Students</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ complaints }}</h2>
+        <p>Total Complaints</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ rooms }}</h2>
+        <p>Total Rooms</p>
+    </div>
+
 </div>
 
 {% endblock %}
