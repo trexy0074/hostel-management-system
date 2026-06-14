@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "hostel_secret_key"
@@ -11,20 +12,70 @@ def home():
     return render_template("index.html")
 
 
-# ---------------- REGISTER ----------------
-@app.route("/register")
+# ---------------- REGISTER (REAL DB LOGIN SYSTEM) ----------------
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = sqlite3.connect("hostel.db")
+        cur = conn.cursor()
+
+        try:
+            cur.execute("""
+                INSERT INTO User_Account (Username, Password, User_Role)
+                VALUES (?, ?, ?)
+            """, (username, password, "Student"))
+
+            conn.commit()
+        except:
+            conn.close()
+            return "Username already exists"
+
+        conn.close()
+        return redirect("/login")
+
     return render_template("register.html")
 
 
-# ---------------- LOGIN (SESSION ENABLED) ----------------
+# ---------------- LOGIN (REAL AUTH USING USER_ACCOUNT) ----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
+        password = request.form["password"]
 
-        session["user"] = username
-        return redirect("/dashboard")
+        conn = sqlite3.connect("hostel.db")
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT User_ID, Username, User_Role
+            FROM User_Account
+            WHERE Username=? AND Password=?
+        """, (username, password))
+
+        user = cur.fetchone()
+
+        if user:
+            session["user_id"] = user[0]
+            session["username"] = user[1]
+            session["role"] = user[2]
+
+            # update last login
+            cur.execute("""
+                UPDATE User_Account
+                SET Last_Login=?
+                WHERE User_ID=?
+            """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user[0]))
+
+            conn.commit()
+            conn.close()
+
+            return redirect("/dashboard")
+
+        conn.close()
+        return "Invalid username or password"
 
     return render_template("login.html")
 
@@ -32,85 +83,81 @@ def login():
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
+    session.clear()
     return redirect("/login")
 
 
-# ---------------- DASHBOARD (DYNAMIC) ----------------
+# ---------------- DASHBOARD (DYNAMIC REAL DATA) ----------------
 @app.route("/dashboard")
 def dashboard():
-    if "user" not in session:
+    if "user_id" not in session:
         return redirect("/login")
 
     conn = sqlite3.connect("hostel.db")
     cur = conn.cursor()
 
-    # total users
-    cur.execute("SELECT COUNT(*) FROM users")
-    users = cur.fetchone()[0]
+    # real data from your database
+    cur.execute("SELECT COUNT(*) FROM Student")
+    students = cur.fetchone()[0]
 
-    # complaints count (safe)
-    try:
-        cur.execute("SELECT COUNT(*) FROM complaints")
-        complaints = cur.fetchone()[0]
-    except:
-        complaints = 0
+    cur.execute("SELECT COUNT(*) FROM Complaint")
+    complaints = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM Room")
+    rooms = cur.fetchone()[0]
 
     conn.close()
 
     return render_template(
         "dashboard.html",
-        users=users,
-        complaints=complaints
+        students=students,
+        complaints=complaints,
+        rooms=rooms,
+        username=session["username"],
+        role=session["role"]
     )
 
 
 # ---------------- PROFILE ----------------
 @app.route("/profile")
 def profile():
-    if "user" not in session:
+    if "user_id" not in session:
         return redirect("/login")
 
     return render_template("profile.html")
 
 
-# ---------------- BOOK HOSTEL ----------------
+# ---------------- OTHER PAGES (UNCHANGED UI PAGES) ----------------
 @app.route("/book-hostel")
 def book_hostel():
     return render_template("book_hostel.html")
 
 
-# ---------------- ROOM DETAILS ----------------
 @app.route("/room-details")
 def room_details():
     return render_template("room_details.html")
 
 
-# ---------------- COMPLAINT ----------------
 @app.route("/complaint")
 def complaint():
     return render_template("complaint.html")
 
 
-# ---------------- FEEDBACK ----------------
 @app.route("/feedback")
 def feedback():
     return render_template("feedback.html")
 
 
-# ---------------- CHANGE PASSWORD ----------------
 @app.route("/change-password")
 def change_password():
     return render_template("change_password.html")
 
 
-# ---------------- FORGOT PASSWORD ----------------
 @app.route("/forgot-password")
 def forgot_password():
     return render_template("forgot_password.html")
 
 
-# ---------------- REGISTERED COMPLAINT ----------------
 @app.route("/registered-complaint")
 def registered_complaint():
     return render_template("registered_complaint.html")
