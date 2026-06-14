@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f6f9;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #1e3a8a;
+    padding: 15px;
+}
+
+.navbar a {
+    color: white;
+    margin-right: 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* CONTAINER */
+.container {
+    padding: 20px;
+}
+
+/* FLASH MESSAGE */
+.flash {
+    background: #d1e7dd;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 15px;
+    background: #ddd;
+    margin-top: 20px;
+}
