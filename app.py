@@ -116,7 +116,7 @@ def dashboard():
     )
 
 
-# ----------------  ADMIN PANEL (NEW UPGRADE) ----------------
+# ---------------- ADMIN PANEL ----------------
 @app.route("/admin")
 def admin_panel():
     if "user_id" not in session:
@@ -128,15 +128,12 @@ def admin_panel():
     conn = sqlite3.connect("hostel.db")
     cur = conn.cursor()
 
-    # users
     cur.execute("SELECT User_ID, Username, User_Role FROM User_Account")
     users = cur.fetchall()
 
-    # complaints
     cur.execute("SELECT Complaint_ID, Student_ID, Complaint_Type, Status FROM Complaint")
     complaints = cur.fetchall()
 
-    # rooms
     cur.execute("SELECT Room_ID, Room_Number, Room_Type, Room_Status FROM Room")
     rooms = cur.fetchall()
 
@@ -148,6 +145,59 @@ def admin_panel():
         complaints=complaints,
         rooms=rooms
     )
+
+
+# ---------------- 🔥 DELETE USER ----------------
+@app.route("/admin/delete-user/<int:user_id>")
+def delete_user(user_id):
+    if session.get("role") != "Admin":
+        return "Access Denied"
+
+    conn = sqlite3.connect("hostel.db")
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM User_Account WHERE User_ID=?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
+
+# ---------------- 🔥 DELETE COMPLAINT ----------------
+@app.route("/admin/delete-complaint/<int:cid>")
+def delete_complaint(cid):
+    if session.get("role") != "Admin":
+        return "Access Denied"
+
+    conn = sqlite3.connect("hostel.db")
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM Complaint WHERE Complaint_ID=?", (cid,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
+
+# ---------------- 🔥 RESOLVE COMPLAINT ----------------
+@app.route("/admin/resolve-complaint/<int:cid>")
+def resolve_complaint(cid):
+    if session.get("role") != "Admin":
+        return "Access Denied"
+
+    conn = sqlite3.connect("hostel.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE Complaint
+        SET Status='Resolved'
+        WHERE Complaint_ID=?
+    """, (cid,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
 
 
 # ---------------- PROFILE ----------------

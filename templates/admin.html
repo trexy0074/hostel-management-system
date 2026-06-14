@@ -2,62 +2,138 @@
 
 {% block content %}
 
-<h2>Admin Panel</h2>
+<div class="admin-layout">
 
-<h3>👤 Users</h3>
-<table border="1" cellpadding="8">
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Role</th>
-    </tr>
-    {% for u in users %}
-    <tr>
-        <td>{{ u[0] }}</td>
-        <td>{{ u[1] }}</td>
-        <td>{{ u[2] }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
 
-<br>
+        <a href="/dashboard">🏠 Dashboard</a>
+        <a href="#users">👤 Users</a>
+        <a href="#complaints">⚠ Complaints</a>
+        <a href="#rooms">🏠 Rooms</a>
+        <a href="/logout">🚪 Logout</a>
+    </div>
 
-<h3>⚠ Complaints</h3>
-<table border="1" cellpadding="8">
-    <tr>
-        <th>ID</th>
-        <th>Student ID</th>
-        <th>Type</th>
-        <th>Status</th>
-    </tr>
-    {% for c in complaints %}
-    <tr>
-        <td>{{ c[0] }}</td>
-        <td>{{ c[1] }}</td>
-        <td>{{ c[2] }}</td>
-        <td>{{ c[3] }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <!-- MAIN CONTENT -->
+    <div class="admin-main">
 
-<br>
+        <h2>Welcome Admin</h2>
 
-<h3>🏠 Rooms</h3>
-<table border="1" cellpadding="8">
-    <tr>
-        <th>ID</th>
-        <th>Number</th>
-        <th>Type</th>
-        <th>Status</th>
-    </tr>
-    {% for r in rooms %}
-    <tr>
-        <td>{{ r[0] }}</td>
-        <td>{{ r[1] }}</td>
-        <td>{{ r[2] }}</td>
-        <td>{{ r[3] }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <!-- CARDS -->
+        <div class="grid">
+
+            <div class="card box">
+                <h3>Total Users</h3>
+                <p>{{ users|length }}</p>
+            </div>
+
+            <div class="card box">
+                <h3>Total Complaints</h3>
+                <p>{{ complaints|length }}</p>
+            </div>
+
+            <div class="card box">
+                <h3>Total Rooms</h3>
+                <p>{{ rooms|length }}</p>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <!-- USERS TABLE -->
+        <h3 id="users">Users</h3>
+        <table class="styled-table">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+
+            {% for u in users %}
+            <tr>
+                <td>{{ u[0] }}</td>
+                <td>{{ u[1] }}</td>
+                <td>{{ u[2] }}</td>
+                <td>
+                    {% if u[2] != 'Admin' %}
+                    <a href="/admin/delete-user/{{ u[0] }}" 
+                       onclick="return confirm('Delete this user?')">
+                        ❌ Delete
+                    </a>
+                    {% else %}
+                    🔒 Protected
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+
+        <!-- COMPLAINTS TABLE -->
+        <h3 id="complaints">Complaints</h3>
+        <table class="styled-table">
+            <tr>
+                <th>ID</th>
+                <th>Student ID</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+            {% for c in complaints %}
+            <tr>
+                <td>{{ c[0] }}</td>
+                <td>{{ c[1] }}</td>
+                <td>{{ c[2] }}</td>
+                <td>{{ c[3] }}</td>
+                <td>
+                    <a href="/admin/delete-complaint/{{ c[0] }}"
+                       onclick="return confirm('Delete complaint?')">
+                        ❌ Delete
+                    </a>
+
+                    |
+
+                    {% if c[3] != 'Resolved' %}
+                    <a href="/admin/resolve-complaint/{{ c[0] }}">
+                        ✔ Resolve
+                    </a>
+                    {% else %}
+                    ✔ Done
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+
+        <!-- ROOMS TABLE -->
+        <h3 id="rooms">Rooms</h3>
+        <table class="styled-table">
+            <tr>
+                <th>ID</th>
+                <th>Number</th>
+                <th>Type</th>
+                <th>Status</th>
+            </tr>
+
+            {% for r in rooms %}
+            <tr>
+                <td>{{ r[0] }}</td>
+                <td>{{ r[1] }}</td>
+                <td>{{ r[2] }}</td>
+                <td>{{ r[3] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+
+</div>
 
 {% endblock %}

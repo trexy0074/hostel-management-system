@@ -3,7 +3,6 @@
 <head>
     <title>Hostel Management System</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -12,9 +11,24 @@
 <!-- NAVBAR -->
 <nav class="navbar">
     <a href="/">Home</a>
-    <a href="/dashboard">Dashboard</a>
-    <a href="/profile">Profile</a>
-    <a href="/logout">Logout</a>
+
+    {% if session.get('user_id') %}
+
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Profile</a>
+
+        {% if session.get('role') == 'Admin' %}
+            <a href="/admin">Admin Panel</a>
+        {% endif %}
+
+        <a href="/logout">Logout</a>
+
+    {% else %}
+
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+
+    {% endif %}
 </nav>
 
 <!-- FLASH MESSAGES -->
