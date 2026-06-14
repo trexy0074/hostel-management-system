@@ -12,7 +12,7 @@ def home():
     return render_template("index.html")
 
 
-# ---------------- REGISTER ----------------
+# ---------------- AUTH ----------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -22,24 +22,19 @@ def register():
         conn = sqlite3.connect("hostel.db")
         cur = conn.cursor()
 
-        try:
-            cur.execute("""
-                INSERT INTO User_Account (Username, Password, User_Role)
-                VALUES (?, ?, ?)
-            """, (username, password, "Student"))
+        cur.execute("""
+            INSERT INTO User_Account (Username, Password, User_Role, Last_Login)
+            VALUES (?, ?, ?, ?)
+        """, (username, password, "Student", None))
 
-            conn.commit()
-        except:
-            conn.close()
-            return "Username already exists"
-
+        conn.commit()
         conn.close()
+
         return redirect("/login")
 
-    return render_template("register.html")
+    return render_template("auth/register.html")
 
 
-# ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -71,22 +66,24 @@ def login():
             conn.commit()
             conn.close()
 
-            return redirect("/dashboard")
+            if user[2] == "Admin":
+                return redirect("/admin")
+            else:
+                return redirect("/dashboard")
 
         conn.close()
         return "Invalid username or password"
 
-    return render_template("login.html")
+    return render_template("auth/login.html")
 
 
-# ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
 
-# ---------------- DASHBOARD ----------------
+# ---------------- STUDENT DASHBOARD ----------------
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session:
@@ -107,7 +104,7 @@ def dashboard():
     conn.close()
 
     return render_template(
-        "dashboard.html",
+        "student/dashboard.html",
         students=students,
         complaints=complaints,
         rooms=rooms,
@@ -116,13 +113,125 @@ def dashboard():
     )
 
 
-# ---------------- ADMIN PANEL ----------------
-@app.route("/admin")
-def admin_panel():
+# ---------------- STUDENT REGISTRATION ----------------
+@app.route("/student/register", methods=["GET", "POST"])
+def student_register():
+    if request.method == "POST":
+
+        conn = sqlite3.connect("hostel.db")
+        cur = conn.cursor()
+
+        cur.execute("""
+            INSERT INTO Student
+            (Student_Name, Gender, Contact_Number, Email, Course, Address, Room_ID)
+            VALUES (?, ?, ?, ?, ?, ?, NULL)
+        """, (
+            request.form["name"],
+            request.form["gender"],
+            request.form["phone"],
+            request.form["email"],
+            request.form["course"],
+            request.form["address"]
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect("/dashboard")
+
+    return render_template("student/register_student.html")
+
+
+# ---------------- ROOM DETAILS ----------------
+@app.route("/room-details")
+def room_details():
+    conn = sqlite3.connect("hostel.db")
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM Room")
+    rooms = cur.fetchall()
+
+    conn.close()
+
+    return render_template("student/room_details.html", rooms=rooms)
+
+
+# ---------------- BOOK HOSTEL ----------------
+@app.route("/book-hostel")
+def book_hostel():
     if "user_id" not in session:
         return redirect("/login")
 
-    if session.get("role") != "Admin":
+    return render_template("student/book_hostel.html")
+
+
+# ---------------- COMPLAINT ----------------
+@app.route("/complaint", methods=["GET", "POST"])
+def complaint():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        conn = sqlite3.connect("hostel.db")
+        cur = conn.cursor()
+
+        cur.execute("""
+            INSERT INTO Complaint
+            (Student_ID, Complaint_Type, Complaint_Details, Complaint_Date, Status)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            session["user_id"],
+            request.form["type"],
+            request.form["details"],
+            datetime.now().strftime("%Y-%m-%d"),
+            "Pending"
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect("/my-complaints")
+
+    return render_template("student/complaint.html")
+
+
+# ---------------- MY COMPLAINTS ----------------
+@app.route("/my-complaints")
+def my_complaints():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("hostel.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT * FROM Complaint
+        WHERE Student_ID=?
+    """, (session["user_id"],))
+
+    complaints = cur.fetchall()
+    conn.close()
+
+    return render_template("student/my_complaints.html", complaints=complaints)
+
+
+# ---------------- FEEDBACK ----------------
+@app.route("/feedback", methods=["GET", "POST"])
+def feedback():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        return redirect("/dashboard")
+
+    return render_template("student/feedback.html")
+
+
+# ---------------- ADMIN ----------------
+@app.route("/admin")
+def admin_panel():
+    if "user_id" not in session or session.get("role") != "Admin":
         return "Access Denied"
 
     conn = sqlite3.connect("hostel.db")
@@ -131,23 +240,23 @@ def admin_panel():
     cur.execute("SELECT User_ID, Username, User_Role FROM User_Account")
     users = cur.fetchall()
 
-    cur.execute("SELECT Complaint_ID, Student_ID, Complaint_Type, Status FROM Complaint")
+    cur.execute("SELECT * FROM Complaint")
     complaints = cur.fetchall()
 
-    cur.execute("SELECT Room_ID, Room_Number, Room_Type, Room_Status FROM Room")
+    cur.execute("SELECT * FROM Room")
     rooms = cur.fetchall()
 
     conn.close()
 
     return render_template(
-        "admin.html",
+        "admin/admin.html",
         users=users,
         complaints=complaints,
         rooms=rooms
     )
 
 
-# ---------------- 🔥 DELETE USER ----------------
+# ---------------- DELETE USER ----------------
 @app.route("/admin/delete-user/<int:user_id>")
 def delete_user(user_id):
     if session.get("role") != "Admin":
@@ -163,7 +272,7 @@ def delete_user(user_id):
     return redirect("/admin")
 
 
-# ---------------- 🔥 DELETE COMPLAINT ----------------
+# ---------------- DELETE COMPLAINT ----------------
 @app.route("/admin/delete-complaint/<int:cid>")
 def delete_complaint(cid):
     if session.get("role") != "Admin":
@@ -179,7 +288,7 @@ def delete_complaint(cid):
     return redirect("/admin")
 
 
-# ---------------- 🔥 RESOLVE COMPLAINT ----------------
+# ---------------- RESOLVE COMPLAINT ----------------
 @app.route("/admin/resolve-complaint/<int:cid>")
 def resolve_complaint(cid):
     if session.get("role") != "Admin":
@@ -198,51 +307,6 @@ def resolve_complaint(cid):
     conn.close()
 
     return redirect("/admin")
-
-
-# ---------------- PROFILE ----------------
-@app.route("/profile")
-def profile():
-    if "user_id" not in session:
-        return redirect("/login")
-
-    return render_template("profile.html")
-
-
-# ---------------- OTHER PAGES ----------------
-@app.route("/book-hostel")
-def book_hostel():
-    return render_template("book_hostel.html")
-
-
-@app.route("/room-details")
-def room_details():
-    return render_template("room_details.html")
-
-
-@app.route("/complaint")
-def complaint():
-    return render_template("complaint.html")
-
-
-@app.route("/feedback")
-def feedback():
-    return render_template("feedback.html")
-
-
-@app.route("/change-password")
-def change_password():
-    return render_template("change_password.html")
-
-
-@app.route("/forgot-password")
-def forgot_password():
-    return render_template("forgot_password.html")
-
-
-@app.route("/registered-complaint")
-def registered_complaint():
-    return render_template("registered_complaint.html")
 
 
 # ---------------- RUN ----------------

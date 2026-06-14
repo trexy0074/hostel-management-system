@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Welcome {{ username }}</h2>
+<p>Role: {{ role }}</p>
+
+<div class="grid">
+    <div class="card">Students: {{ students }}</div>
+    <div class="card">Complaints: {{ complaints }}</div>
+    <div class="card">Rooms: {{ rooms }}</div>
+</div>
+
+{% endblock %}

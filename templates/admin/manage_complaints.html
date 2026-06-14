@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Manage Complaints</h2>
+
+<table border="1" width="100%">
+<tr>
+    <th>ID</th>
+    <th>Student ID</th>
+    <th>Type</th>
+    <th>Details</th>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+
+{% for c in complaints %}
+<tr>
+    <td>{{ c[0] }}</td>
+    <td>{{ c[1] }}</td>
+    <td>{{ c[2] }}</td>
+    <td>{{ c[3] }}</td>
+    <td>{{ c[4] }}</td>
+    <td>{{ c[5] }}</td>
+
+    <td>
+        {% if c[5] != 'Resolved' %}
+        <a href="/admin/resolve-complaint/{{ c[0] }}">Resolve</a>
+        {% else %}
+        Done
+        {% endif %}
+
+        |
+        <a href="/admin/delete-complaint/{{ c[0] }}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

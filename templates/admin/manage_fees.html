@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Fee Management</h2>
+
+<table border="1" width="100%">
+<tr>
+    <th>Fee ID</th>
+    <th>Student ID</th>
+    <th>Amount</th>
+    <th>Date</th>
+    <th>Mode</th>
+    <th>Status</th>
+</tr>
+
+{% for f in fees %}
+<tr>
+    <td>{{ f[0] }}</td>
+    <td>{{ f[1] }}</td>
+    <td>{{ f[2] }}</td>
+    <td>{{ f[3] }}</td>
+    <td>{{ f[4] }}</td>
+    <td>{{ f[5] }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

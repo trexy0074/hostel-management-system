@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>My Complaints</h2>
+
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Type</th>
+    <th>Status</th>
+</tr>
+
+{% for c in complaints %}
+<tr>
+    <td>{{ c[0] }}</td>
+    <td>{{ c[2] }}</td>
+    <td>{{ c[5] }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Student Registration</h2>
+
+<form method="POST">
+
+    <input name="name" placeholder="Name"><br><br>
+    <input name="gender" placeholder="Gender"><br><br>
+    <input name="phone" placeholder="Phone"><br><br>
+    <input name="email" placeholder="Email"><br><br>
+    <input name="course" placeholder="Course"><br><br>
+    <textarea name="address" placeholder="Address"></textarea><br><br>
+
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}

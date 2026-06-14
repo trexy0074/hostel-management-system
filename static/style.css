@@ -8,11 +8,12 @@ body {
 .navbar {
     background: #1e3a8a;
     padding: 15px;
+    display: flex;
+    gap: 15px;
 }
 
 .navbar a {
     color: white;
-    margin-right: 15px;
     text-decoration: none;
     font-weight: bold;
 }
@@ -20,6 +21,14 @@ body {
 /* CONTAINER */
 .container {
     padding: 20px;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 15px;
+    background: #ddd;
+    margin-top: 30px;
 }
 
 /* FLASH MESSAGE */
@@ -30,25 +39,9 @@ body {
     border-radius: 5px;
 }
 
-/* FOOTER */
-.footer {
-    text-align: center;
-    padding: 15px;
-    background: #ddd;
-    margin-top: 20px;
-}
-
-/* DASHBOARD PREMIUM UI */
-
-.title {
-    font-size: 28px;
-    margin-bottom: 5px;
-}
-
-.subtitle {
-    color: #666;
-    margin-bottom: 20px;
-}
+/* =========================
+   DASHBOARD UI (IMPORTANT)
+========================= */
 
 .grid {
     display: grid;
@@ -57,10 +50,10 @@ body {
 }
 
 .box {
-    text-align: center;
-    padding: 25px;
     background: white;
+    padding: 20px;
     border-radius: 12px;
+    text-align: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     transition: 0.2s;
 }
@@ -68,57 +61,57 @@ body {
 .box:hover {
     transform: translateY(-5px);
 }
-/* ADMIN PANEL LAYOUT */
+
+/* =========================
+   TABLES (ADMIN + STUDENT)
+========================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #f1f1f1;
+}
+
+/* =========================
+   ADMIN LAYOUT
+========================= */
 
 .admin-layout {
     display: flex;
     min-height: 100vh;
 }
 
-/* SIDEBAR */
 .sidebar {
     width: 220px;
-    background: #1e1e2f;
+    background: #111827;
     color: white;
     padding: 20px;
-}
-
-.sidebar h2 {
-    margin-bottom: 20px;
 }
 
 .sidebar a {
     display: block;
     color: white;
+    padding: 10px;
     text-decoration: none;
-    margin: 10px 0;
-    padding: 8px;
     border-radius: 5px;
 }
 
 .sidebar a:hover {
-    background: #333;
+    background: #374151;
 }
 
-/* MAIN */
 .admin-main {
     flex: 1;
     padding: 20px;
-}
-
-/* TABLE */
-.styled-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.styled-table th,
-.styled-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-}
-
-.styled-table th {
-    background: #f4f4f4;
 }
