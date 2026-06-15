@@ -20,11 +20,14 @@ Backend: PHP
 Database: MySQL
 Server Environment: Apache (XAMPP / WAMP / LAMP)
 Installation Guide
+
 Step 1: Clone the Repository
-git clone https://github.com/trexy0074/hostel-management-system.git
+git clone https://github.com/trexy0074/hostel-management-system.
+
 Step 2: Move to Server Directory
 XAMPP: htdocs
 WAMP: www
+
 Step 3: Start Server
 
 Start Apache and MySQL using XAMPP/WAMP control panel.
@@ -33,11 +36,13 @@ Step 4: Setup Database
 Open phpMyAdmin
 Create database: hostel
 Import SQL file from /database folder
+
 Step 5: Run Project
 
 Open browser and go to:
 
 http://localhost/hostel-management-system
+
 Project Structure
 
 hostel-management-system/
@@ -48,6 +53,7 @@ hostel-management-system/
 ├── database/       SQL database file
 ├── config/         Database configuration
 └── index.php       Entry point
+
 Future Enhancements
 Online fee payment integration
 Complaint and grievance system
