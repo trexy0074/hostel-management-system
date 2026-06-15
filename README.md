@@ -39,6 +39,7 @@ Open browser and go to:
 
 http://localhost/hostel-management-system
 Project Structure
+
 hostel-management-system/
 │
 ├── admin/          Admin panel files
@@ -53,9 +54,6 @@ Complaint and grievance system
 Email and SMS notifications
 Improved responsive UI
 Role-based access control system
-Screenshots
-
-(Add project screenshots here for better presentation)
 
 Author
 
